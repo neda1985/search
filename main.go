@@ -4,39 +4,43 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"flag"
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/go-elasticsearch/v8/esapi"
-	"github.com/joho/godotenv"
 	"log"
 	"net/http"
 	"os"
 )
 
+var host = flag.String("host", os.Getenv("ELASTIC_HOST"), "The elastic host to use")
+var index = flag.String("index", os.Getenv("INDEX_NAME"), "The index name")
+var port = flag.String("port", os.Getenv("PORT"), "port")
+
+func getConfig() elasticsearch.Config {
+	flag.Parse()
+	cfg := elasticsearch.Config{
+		Addresses: []string{
+			*host,
+		},
+	}
+	return cfg
+
+}
 func main() {
+	flag.Parse()
 	http.HandleFunc("/index/song", indexSong)
 	http.HandleFunc("/index/song/get", getSongs)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(*port, nil))
 }
 
 func indexSong(w http.ResponseWriter, r *http.Request) {
-
-	err := godotenv.Load(".env")
-
-	if err != nil {
-		log.Fatalf("Error loading .env file")
-	}
-
 	req := esapi.IndexRequest{
-		Index:   os.Getenv("INDEX_NAME"),
+		Index:   *index,
 		Body:    r.Body,
 		Refresh: "true",
 	}
-	cfg := elasticsearch.Config{
-		Addresses: []string{
-			os.Getenv("ELASTIC_HOST"),
-		},
-	}
-	es, err := elasticsearch.NewClient(cfg)
+
+	es, err := elasticsearch.NewClient(getConfig())
 	if err != nil {
 		log.Fatalf("Error creating the client: %s", err)
 	}
@@ -63,24 +67,15 @@ type errorResponse struct {
 }
 
 func getSongs(w http.ResponseWriter, r *http.Request) {
-	err := godotenv.Load(".env")
+	flag.Parse()
 
-	if err != nil {
-		log.Fatalf("Error loading .env file")
-	}
 	moods := r.URL.Query().Get("moods")
 	genre := r.URL.Query().Get("genre")
 	id := r.URL.Query().Get("id")
 	var (
 		m map[string]interface{}
 	)
-
-	cfg := elasticsearch.Config{
-		Addresses: []string{
-			os.Getenv("ELASTIC_HOST"),
-		},
-	}
-	es, err := elasticsearch.NewClient(cfg)
+	es, err := elasticsearch.NewClient(getConfig())
 	if err != nil {
 		log.Fatalf("Error creating the client: %s", err)
 	}
@@ -166,3 +161,4 @@ func queryBuilder(moods string, genre string, id string) map[string]interface{} 
 	}
 	return m
 }
+
