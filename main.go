@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"flag"
 	"github.com/elastic/go-elasticsearch/v8"
@@ -46,7 +45,7 @@ func indexSong(w http.ResponseWriter, r *http.Request) {
 		Refresh: "true",
 	}
 	checkClientError()
-	res, err := req.Do(context.Background(), es)
+	res, err := req.Do(r.Context(), es)
 	if err != nil {
 		log.Fatalf("Error getting response: %s", err)
 	}
@@ -87,7 +86,7 @@ func getSongs(w http.ResponseWriter, r *http.Request) {
 
 	// Perform the search request.
 	response, err := es.Search(
-		es.Search.WithContext(context.Background()),
+		es.Search.WithContext(r.Context()),
 		es.Search.WithIndex(*index),
 		es.Search.WithBody(&buf),
 		es.Search.WithTrackTotalHits(true),
