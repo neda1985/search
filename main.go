@@ -14,25 +14,21 @@ import (
 var host = flag.String("host", os.Getenv("ELASTIC_HOST"), "The elastic host to use")
 var index = flag.String("index", os.Getenv("INDEX_NAME"), "The index name")
 var port = flag.String("port", os.Getenv("PORT"), "port")
-var es, clientErr = elasticsearch.NewClient(getConfig())
+var cfg elasticsearch.Config
+var es  *elasticsearch.Client
 
-func getConfig() elasticsearch.Config {
+func main() {
 	flag.Parse()
-	cfg := elasticsearch.Config{
+	cfg =elasticsearch.Config{
 		Addresses: []string{
 			*host,
 		},
 	}
-	return cfg
-
-}
-func checkClientError() {
-	if clientErr != nil {
-		log.Fatalf("Error creating the client: %s", clientErr)
+	var err error
+	es, err =elasticsearch.NewClient(cfg)
+	if err != nil {
+		log.Fatalf("Error creating the client: %s", err)
 	}
-}
-func main() {
-	flag.Parse()
 	http.HandleFunc("/index/song", indexSong)
 	http.HandleFunc("/index/song/get", getSongs)
 	log.Fatal(http.ListenAndServe(*port, nil))
@@ -44,7 +40,7 @@ func indexSong(w http.ResponseWriter, r *http.Request) {
 		Body:    r.Body,
 		Refresh: "true",
 	}
-	checkClientError()
+	//checkClientError()
 	res, err := req.Do(r.Context(), es)
 	if err != nil {
 		log.Fatalf("Error getting response: %s", err)
@@ -76,7 +72,7 @@ func getSongs(w http.ResponseWriter, r *http.Request) {
 	var (
 		m map[string]interface{}
 	)
-	checkClientError()
+	//checkClientError()
 
 	var buf bytes.Buffer
 	query := queryBuilder(moods, genre, id)
