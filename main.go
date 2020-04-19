@@ -14,18 +14,16 @@ import (
 var host = flag.String("host", os.Getenv("ELASTIC_HOST"), "The elastic host to use")
 var index = flag.String("index", os.Getenv("INDEX_NAME"), "The index name")
 var port = flag.String("port", os.Getenv("PORT"), "port")
-var cfg elasticsearch.Config
 var es  *elasticsearch.Client
 
 func main() {
 	flag.Parse()
-	cfg =elasticsearch.Config{
+	var err error
+	es, err =elasticsearch.NewClient(elasticsearch.Config{
 		Addresses: []string{
 			*host,
 		},
-	}
-	var err error
-	es, err =elasticsearch.NewClient(cfg)
+	})
 	if err != nil {
 		log.Fatalf("Error creating the client: %s", err)
 	}
