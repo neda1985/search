@@ -14,12 +14,12 @@ import (
 var host = flag.String("host", os.Getenv("ELASTIC_HOST"), "The elastic host to use")
 var index = flag.String("index", os.Getenv("INDEX_NAME"), "The index name")
 var port = flag.String("port", os.Getenv("PORT"), "port")
-var es  *elasticsearch.Client
+var es *elasticsearch.Client
 
 func main() {
 	flag.Parse()
 	var err error
-	es, err =elasticsearch.NewClient(elasticsearch.Config{
+	es, err = elasticsearch.NewClient(elasticsearch.Config{
 		Addresses: []string{
 			*host,
 		},
@@ -153,4 +153,3 @@ func queryBuilder(moods string, genre string, id string) map[string]interface{} 
 	}
 	return m
 }
-

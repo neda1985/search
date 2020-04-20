@@ -17,6 +17,7 @@ require (
 	github.com/shirou/w32 v0.0.0-20160930032740-bb4de0191aa4 // indirect
 	github.com/stretchr/testify v1.4.0
 	golang.org/x/sys v0.0.0-20191120155948-bd437916bb0e // indirect
+	golang.org/x/tools v0.0.0-20200420001825-978e26b7c37c // indirect
 	google.golang.org/appengine v1.6.5 // indirect
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 
