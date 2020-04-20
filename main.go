@@ -62,8 +62,6 @@ type errorResponse struct {
 }
 
 func getSongs(w http.ResponseWriter, r *http.Request) {
-	flag.Parse()
-
 	moods := r.URL.Query().Get("moods")
 	genre := r.URL.Query().Get("genre")
 	id := r.URL.Query().Get("id")
